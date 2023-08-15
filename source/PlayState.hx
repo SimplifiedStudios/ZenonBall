@@ -20,6 +20,9 @@ class PlayState extends FlxState
 	var throwValue = 100;
 	// * Ground Controller
 	var groundLevel = 700;
+	// * Goal Manager
+	var goal:FlxSprite;
+	var goal1:FlxSprite;
 
 	override public function create()
 	{
@@ -35,6 +38,18 @@ class PlayState extends FlxState
 		ball.makeGraphic(30, 30, FlxColor.RED);
 		ball.screenCenter(X);
 		add(ball);
+
+		goal = new FlxSprite();
+		goal.makeGraphic(50, 50, FlxColor.BLUE);
+		goal.x = 0;
+		goal.screenCenter(Y);
+		add(goal);
+
+		goal1 = new FlxSprite();
+		goal1.makeGraphic(50, 50, FlxColor.BLUE);
+		goal1.x = 1440;
+		goal1.screenCenter(Y);
+		add(goal1);
 	}
 
 	override public function update(elapsed:Float)
@@ -43,10 +58,27 @@ class PlayState extends FlxState
 
 		playerController();
 		ballController();
+		goalController();
+	}
+
+	public function goalScored(ball:FlxSprite, goal:FlxSprite)
+	{
+		ball.screenCenter(X);
+	}
+
+	public function goalController()
+	{
+		FlxG.collide(ball, goal);
+		FlxG.collide(ball, goal1);
 	}
 
 	public function ballController()
 	{
+		if (FlxG.keys.anyPressed([FlxKey.R]))
+		{
+			ball.screenCenter(X);
+		}
+
 		if (isCarried == false)
 		{
 			if (ball.y != groundLevel)
