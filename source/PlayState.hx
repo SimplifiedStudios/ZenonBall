@@ -3,70 +3,70 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.FlxState;
 import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
-	/* 
-		This is a project where I try and make a square to be able to hit a another square which will act like a ball.
-	 */
-	// * Character controller
-	var groundLevel = 700;
+	// * Character Controller
 	var player:FlxSprite;
-	var movementMultiplier = 10;
-	var jumpMultiplier = 50;
-
-	// * Ball Controller
+	var walkingValue = 10;
+	var jumpingValue = 100;
+	var movementDirection = 0; // 0 = Null, 1 = Left, 2 = right
+	// * Ball controller
 	var ball:FlxSprite;
-	var currentPlayerDirection = 0; // 0 = Not Moved, 1 = left, 2 = right.
+	var isCarried = false;
+	var throwValue = 100;
+	// * Ground Controller
+	var groundLevel = 700;
 
 	override public function create()
 	{
+		super.create();
+
 		player = new FlxSprite();
-		player.makeGraphic(80, 20, FlxColor.WHITE);
+		player.makeGraphic(30, 50, FlxColor.WHITE);
+		player.screenCenter(X);
+		player.x += 200;
 		add(player);
 
 		ball = new FlxSprite();
 		ball.makeGraphic(30, 30, FlxColor.RED);
 		ball.screenCenter(X);
-		ball.y += 150;
 		add(ball);
 	}
 
 	override public function update(elapsed:Float)
 	{
-		// Player Controller
-		playerManager();
-		// Ball Controller
-		ballController();
-	}
+		super.update(elapsed);
 
-	public function ballCollision(Obj1:FlxSprite, Obj2:FlxSprite)
-	{
-		if (currentPlayerDirection == 1)
-		{
-			Obj1.y -= 200;
-			Obj1.x -= 50;
-		}
-		else if (currentPlayerDirection == 2)
-		{
-			Obj1.y -= 200;
-			Obj1.x += 50;
-		}
+		playerController();
+		ballController();
 	}
 
 	public function ballController()
 	{
-		if (ball.y != groundLevel)
+		if (isCarried == false)
 		{
-			ball.y += 5;
-		}
+			if (ball.y != groundLevel)
+			{
+				ball.y += 10;
+			}
 
-		FlxG.collide(ball, player, ballCollision);
+			if (ball.y > groundLevel)
+			{
+				ball.y = 600;
+			}
+		}
+		else
+		{
+			ball.x = player.x;
+			ball.y = player.y - 15;
+		}
 	}
 
-	public function playerManager()
+	public function playerController()
 	{
 		if (player.y != groundLevel)
 		{
@@ -75,26 +75,71 @@ class PlayState extends FlxState
 
 		if (FlxG.keys.anyPressed([FlxKey.LEFT]))
 		{
-			player.x -= 10;
-			currentPlayerDirection = 1;
+			player.x -= walkingValue;
+			movementDirection = 1;
 		}
 
 		if (FlxG.keys.anyPressed([FlxKey.RIGHT]))
 		{
-			player.x += 10;
-			currentPlayerDirection = 2;
+			player.x += walkingValue;
+			movementDirection = 2;
 		}
 
-		if (FlxG.keys.anyPressed([FlxKey.O]))
+		if (FlxG.keys.anyPressed([FlxKey.SPACE]))
 		{
-			player.x = ball.x - 100;
-			player.y -= 20;
+			player.y -= jumpingValue;
 		}
 
-		// if (FlxG.keys.anyPressed([FlxKey.B]))
-		// {
-		// 	ball.x = player.x += 100;
-		// 	ball.y = player.y -= 10;
-		// }
+		if (FlxG.keys.anyPressed([FlxKey.E]))
+		{
+			if (isCarried == false)
+			{
+				return;
+			}
+			else
+			{
+				isCarried = false;
+				ball.y += 200;
+				if (movementDirection == 1)
+				{
+					ball.x -= 400;
+				}
+				else if (movementDirection == 2)
+				{
+					ball.x += 400;
+				}
+			}
+		}
+
+		if (FlxG.keys.anyPressed([FlxKey.Q]))
+		{
+			if (isCarried)
+			{
+				isCarried = false;
+				ball.x -= 50;
+				ball.y -= 300;
+			}
+		}
+
+		if (isCarried)
+		{
+			return;
+		}
+		else
+		{
+			FlxG.collide(ball, player, giveBallToPlayer);
+		}
+	}
+
+	public function giveBallToPlayer(ball:FlxSprite, player:FlxSprite)
+	{
+		if (isCarried)
+		{
+			return;
+		}
+		else
+		{
+			isCarried = true;
+		}
 	}
 }
