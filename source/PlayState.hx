@@ -24,11 +24,11 @@ class PlayState extends FlxState
 	override public function create()
 	{
 		player = new FlxSprite();
-		player.makeGraphic(50, 50, FlxColor.WHITE);
+		player.makeGraphic(80, 20, FlxColor.WHITE);
 		add(player);
 
 		ball = new FlxSprite();
-		ball.makeGraphic(50, 50, FlxColor.RED);
+		ball.makeGraphic(30, 30, FlxColor.RED);
 		ball.screenCenter(X);
 		ball.y += 150;
 		add(ball);
@@ -46,13 +46,13 @@ class PlayState extends FlxState
 	{
 		if (currentPlayerDirection == 1)
 		{
-			Obj1.y -= 10;
-			Obj1.x -= 3;
+			Obj1.y -= 200;
+			Obj1.x -= 50;
 		}
 		else if (currentPlayerDirection == 2)
 		{
-			Obj1.y -= 10;
-			Obj1.x += 3;
+			Obj1.y -= 200;
+			Obj1.x += 50;
 		}
 	}
 
@@ -60,7 +60,7 @@ class PlayState extends FlxState
 	{
 		if (ball.y != groundLevel)
 		{
-			ball.y += 1;
+			ball.y += 5;
 		}
 
 		FlxG.collide(ball, player, ballCollision);
